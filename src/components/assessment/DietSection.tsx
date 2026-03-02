@@ -19,20 +19,14 @@ export default function DietSection({ answers, onChange }: DietSectionProps) {
   return (
     <div>
       <div className="mb-6">
-        <span className="inline-block text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded mb-2">
+        <span className="inline-block text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg mb-2">
           {dietSection.scaleName}
         </span>
-        <p className="text-sm text-slate-600">{dietSection.description}</p>
+        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{dietSection.description}</p>
       </div>
-      <div className="space-y-1">
+      <div>
         {dietSection.questions.map((q, i) => (
-          <LikertScale
-            key={q.id}
-            question={q}
-            value={answers.items[i]}
-            onChange={(val) => handleChange(i, val)}
-            questionNumber={i + 1}
-          />
+          <LikertScale key={q.id} question={q} value={answers.items[i]} onChange={(val) => handleChange(i, val)} questionNumber={i + 1} />
         ))}
       </div>
     </div>

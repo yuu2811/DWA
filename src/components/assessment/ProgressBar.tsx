@@ -3,8 +3,8 @@
 const steps = [
   { label: '睡眠', icon: '🌙' },
   { label: 'ストレス', icon: '🧠' },
-  { label: '疲労', icon: '🔋' },
-  { label: '食事', icon: '🥗' },
+  { label: '疲労', icon: '⚡' },
+  { label: '食事', icon: '🥬' },
   { label: '運動', icon: '🏃' },
 ];
 
@@ -13,50 +13,58 @@ interface ProgressBarProps {
 }
 
 export default function ProgressBar({ currentStep }: ProgressBarProps) {
+  const progress = (currentStep / (steps.length - 1)) * 100;
+
   return (
-    <div className="w-full mb-8">
-      <div className="flex items-center justify-between">
-        {steps.map((step, index) => (
-          <div key={step.label} className="flex items-center flex-1">
-            <div className="flex flex-col items-center flex-1">
+    <div className="mb-10">
+      {/* Track */}
+      <div className="progress-track rounded-full mb-5">
+        <div
+          className="progress-track-fill rounded-full"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      {/* Step indicators */}
+      <div className="flex justify-between">
+        {steps.map((step, index) => {
+          const isComplete = index < currentStep;
+          const isCurrent = index === currentStep;
+          return (
+            <div key={step.label} className="flex flex-col items-center gap-1.5">
               <div
-                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-lg border-2 transition-colors ${
-                  index < currentStep
-                    ? 'bg-blue-600 border-blue-600 text-white'
-                    : index === currentStep
-                      ? 'bg-white border-blue-600 text-blue-600'
-                      : 'bg-white border-slate-200 text-slate-400'
-                }`}
+                className={`
+                  w-10 h-10 rounded-xl flex items-center justify-center text-sm transition-all duration-300
+                  ${isComplete
+                    ? 'bg-[var(--accent-blue)]/20 text-[var(--accent-blue)] scale-90'
+                    : isCurrent
+                      ? 'glass glow-blue scale-105'
+                      : 'bg-[var(--bg-card)] text-[var(--text-muted)]'
+                  }
+                `}
               >
-                {index < currentStep ? (
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
+                {isComplete ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
-                  <span className="text-xs sm:text-sm">{step.icon}</span>
+                  <span>{step.icon}</span>
                 )}
               </div>
               <span
-                className={`text-[10px] sm:text-xs mt-1 font-medium ${
-                  index <= currentStep ? 'text-blue-600' : 'text-slate-400'
+                className={`text-[10px] font-medium transition-colors ${
+                  isCurrent
+                    ? 'text-[var(--text-primary)]'
+                    : isComplete
+                      ? 'text-[var(--accent-blue)]'
+                      : 'text-[var(--text-muted)]'
                 }`}
               >
                 {step.label}
               </span>
             </div>
-            {index < steps.length - 1 && (
-              <div
-                className={`h-0.5 flex-1 mx-0.5 sm:mx-1 -mt-5 ${
-                  index < currentStep ? 'bg-blue-600' : 'bg-slate-200'
-                }`}
-              />
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

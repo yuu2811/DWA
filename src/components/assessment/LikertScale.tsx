@@ -16,26 +16,32 @@ export default function LikertScale({
   questionNumber,
 }: LikertScaleProps) {
   return (
-    <div className="py-4 border-b border-slate-100 last:border-b-0">
-      <p className="text-sm font-medium text-slate-700 mb-3">
-        <span className="text-slate-400 mr-2">Q{questionNumber}.</span>
+    <div className="py-5 border-b border-[var(--border-subtle)] last:border-b-0">
+      <p className="text-sm text-[var(--text-primary)] mb-3 leading-relaxed">
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-[var(--bg-card)] text-[var(--text-muted)] text-[11px] font-semibold mr-2.5 shrink-0">
+          {questionNumber}
+        </span>
         {question.text}
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-        {question.options.map((option) => (
-          <button
-            key={`${question.id}-${option.value}`}
-            type="button"
-            onClick={() => onChange(option.value)}
-            className={`text-left px-3 py-2 rounded-lg border text-sm transition-colors ${
-              value === option.value
-                ? 'bg-blue-50 border-blue-300 text-blue-700 font-medium'
-                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            {option.label}
-          </button>
-        ))}
+      <div className="flex flex-wrap gap-2 pl-8">
+        {question.options.map((option) => {
+          const selected = value === option.value;
+          return (
+            <button
+              key={`${question.id}-${option.value}`}
+              type="button"
+              onClick={() => onChange(option.value)}
+              className={`option-pill px-3.5 py-2 rounded-xl text-[13px] border transition-all
+                ${selected
+                  ? 'bg-[var(--accent-blue)]/10 border-[var(--accent-blue)]/40 text-[var(--accent-blue)] font-medium shadow-sm shadow-blue-500/10'
+                  : 'bg-[var(--bg-card)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }
+              `}
+            >
+              {option.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

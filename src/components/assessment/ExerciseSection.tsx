@@ -19,10 +19,7 @@ const fieldMapping: Record<string, keyof ExerciseAnswers> = {
   'exercise-sitting-hours': 'sittingHours',
 };
 
-export default function ExerciseSection({
-  answers,
-  onChange,
-}: ExerciseSectionProps) {
+export default function ExerciseSection({ answers, onChange }: ExerciseSectionProps) {
   const handleChange = (questionId: string, value: number) => {
     const field = fieldMapping[questionId];
     if (field) {
@@ -38,20 +35,14 @@ export default function ExerciseSection({
   return (
     <div>
       <div className="mb-6">
-        <span className="inline-block text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded mb-2">
+        <span className="inline-block text-[11px] font-medium text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg mb-2">
           {exerciseSection.scaleName}
         </span>
-        <p className="text-sm text-slate-600">{exerciseSection.description}</p>
+        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{exerciseSection.description}</p>
       </div>
-      <div className="space-y-1">
+      <div>
         {exerciseSection.questions.map((q, i) => (
-          <LikertScale
-            key={q.id}
-            question={q}
-            value={getValue(q.id)}
-            onChange={(val) => handleChange(q.id, val)}
-            questionNumber={i + 1}
-          />
+          <LikertScale key={q.id} question={q} value={getValue(q.id)} onChange={(val) => handleChange(q.id, val)} questionNumber={i + 1} />
         ))}
       </div>
     </div>
