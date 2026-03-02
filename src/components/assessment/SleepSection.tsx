@@ -19,12 +19,12 @@ export default function SleepSection({ answers, onChange }: SleepSectionProps) {
   return (
     <div>
       <div className="mb-6">
-        <span className="inline-block text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded mb-2">
+        <span className="inline-block text-[11px] font-medium text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg mb-2">
           {sleepSection.scaleName}
         </span>
-        <p className="text-sm text-slate-600">{sleepSection.description}</p>
+        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{sleepSection.description}</p>
       </div>
-      <div className="space-y-1">
+      <div>
         {sleepSection.questions.map((q, i) => (
           <LikertScale
             key={q.id}

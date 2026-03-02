@@ -1,6 +1,7 @@
 import { DomainResult, AssessmentResult, AllAnswers } from '../types';
 import { scoreSleep } from './sleep';
 import { scoreStress } from './stress';
+import { scoreFatigue } from './fatigue';
 import { scoreDiet } from './diet';
 import { scoreExercise } from './exercise';
 
@@ -8,6 +9,7 @@ export function calculateOverallResult(answers: AllAnswers): AssessmentResult {
   const domains: DomainResult[] = [
     scoreSleep(answers.sleep),
     scoreStress(answers.stress),
+    scoreFatigue(answers.fatigue),
     scoreDiet(answers.diet),
     scoreExercise(answers.exercise),
   ];

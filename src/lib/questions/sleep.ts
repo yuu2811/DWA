@@ -11,7 +11,7 @@ export const sleepSection: QuestionSection = {
   domain: 'sleep',
   title: '睡眠',
   description:
-    '以下の状況で居眠りをしたり、眠くなったりすることがありますか？最近の日常生活を思い浮かべてお答えください。',
+    '以下の状況で居眠りをしたり、眠くなったりすることがありますか？運転業務のある日常を思い浮かべてお答えください。（※ESSは標準化された質問文を使用しています）',
   scaleName: 'ESS（エプワース眠気尺度 日本語版）',
   questions: [
     {

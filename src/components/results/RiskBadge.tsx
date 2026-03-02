@@ -10,40 +10,55 @@ interface RiskBadgeProps {
 const config = {
   low: {
     label: '良好',
-    bgColor: 'bg-green-100',
-    textColor: 'text-green-800',
-    borderColor: 'border-green-300',
-    dotColor: 'bg-green-500',
+    color: 'var(--accent-emerald)',
+    bg: 'rgba(52, 211, 153, 0.1)',
+    border: 'rgba(52, 211, 153, 0.25)',
+    glow: 'rgba(52, 211, 153, 0.12)',
   },
   moderate: {
     label: '要改善',
-    bgColor: 'bg-yellow-100',
-    textColor: 'text-yellow-800',
-    borderColor: 'border-yellow-300',
-    dotColor: 'bg-yellow-500',
+    color: 'var(--accent-amber)',
+    bg: 'rgba(251, 191, 36, 0.1)',
+    border: 'rgba(251, 191, 36, 0.25)',
+    glow: 'rgba(251, 191, 36, 0.12)',
   },
   high: {
     label: '要注意',
-    bgColor: 'bg-red-100',
-    textColor: 'text-red-800',
-    borderColor: 'border-red-300',
-    dotColor: 'bg-red-500',
+    color: 'var(--accent-rose)',
+    bg: 'rgba(251, 113, 133, 0.1)',
+    border: 'rgba(251, 113, 133, 0.25)',
+    glow: 'rgba(251, 113, 133, 0.12)',
   },
 };
 
 const sizeClasses = {
-  sm: 'text-xs px-2 py-0.5',
-  md: 'text-sm px-3 py-1',
-  lg: 'text-base px-4 py-2',
+  sm: 'text-[11px] px-2.5 py-1 gap-1.5',
+  md: 'text-xs px-3 py-1.5 gap-1.5',
+  lg: 'text-sm px-4 py-2 gap-2',
+};
+
+const dotSizes = {
+  sm: 'w-1.5 h-1.5',
+  md: 'w-2 h-2',
+  lg: 'w-2.5 h-2.5',
 };
 
 export default function RiskBadge({ level, size = 'md' }: RiskBadgeProps) {
   const c = config[level];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-semibold rounded-full border ${c.bgColor} ${c.textColor} ${c.borderColor} ${sizeClasses[size]}`}
+      className={`inline-flex items-center font-semibold rounded-full tracking-wide ${sizeClasses[size]}`}
+      style={{
+        background: c.bg,
+        border: `1px solid ${c.border}`,
+        color: c.color,
+        boxShadow: `0 0 16px ${c.glow}`,
+      }}
     >
-      <span className={`w-2 h-2 rounded-full ${c.dotColor}`} />
+      <span
+        className={`rounded-full shrink-0 ${dotSizes[size]} ${level === 'high' ? 'animate-pulse' : ''}`}
+        style={{ background: c.color }}
+      />
       {c.label}
     </span>
   );

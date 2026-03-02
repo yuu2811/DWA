@@ -77,6 +77,40 @@ export const academicReferences: AcademicReference[] = [
     doi: '10.1111/j.1440-1819.2011.02236.x',
   },
   {
+    id: 'fatigue-mhlw',
+    domain: 'fatigue',
+    authors: '厚生労働省',
+    title: '労働者の疲労蓄積度自己診断チェックリスト',
+    journal: '厚生労働省 労働基準局',
+    year: 2023,
+    note:
+      '過重労働による健康障害防止のための総合対策に基づく自己診断ツール。2023年改正版',
+  },
+  {
+    id: 'fatigue-overwork',
+    domain: 'fatigue',
+    authors: '厚生労働省',
+    title: '過重労働による健康障害防止のための総合対策について',
+    journal: '厚生労働省 基発',
+    year: 2020,
+    note:
+      '長時間労働者への面接指導制度の根拠通達。疲労蓄積度チェックリストの活用を推奨',
+  },
+  {
+    id: 'fatigue-drivers',
+    domain: 'fatigue',
+    authors: 'Useche SA, Ortiz VG, Cendales BE',
+    title:
+      'Stress-related psychosocial factors at work, fatigue, and risky driving behavior in bus rapid transport (BRT) drivers',
+    journal: 'Accid Anal Prev',
+    year: 2017,
+    volume: '104',
+    pages: '106-114',
+    doi: '10.1016/j.aap.2017.04.023',
+    note:
+      'バスドライバーにおける疲労蓄積と危険運転行動の関連を検証',
+  },
+  {
     id: 'tokutei-kenshin',
     domain: 'diet',
     authors: '厚生労働省',

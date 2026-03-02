@@ -1,20 +1,11 @@
 export type RiskLevel = 'low' | 'moderate' | 'high';
 
-export type DomainType = 'sleep' | 'stress' | 'diet' | 'exercise';
+export type DomainType = 'sleep' | 'stress' | 'fatigue' | 'diet' | 'exercise';
 
 export interface Question {
   id: string;
   text: string;
   options: { value: number; label: string }[];
-}
-
-export interface NumericQuestion {
-  id: string;
-  text: string;
-  unit: string;
-  min: number;
-  max: number;
-  step?: number;
 }
 
 export interface QuestionSection {
@@ -23,7 +14,6 @@ export interface QuestionSection {
   description: string;
   scaleName: string;
   questions: Question[];
-  numericQuestions?: NumericQuestion[];
 }
 
 export interface SleepAnswers {
@@ -31,6 +21,10 @@ export interface SleepAnswers {
 }
 
 export interface StressAnswers {
+  items: number[];
+}
+
+export interface FatigueAnswers {
   items: number[];
 }
 
@@ -51,6 +45,7 @@ export interface ExerciseAnswers {
 export interface AllAnswers {
   sleep: SleepAnswers;
   stress: StressAnswers;
+  fatigue: FatigueAnswers;
   diet: DietAnswers;
   exercise: ExerciseAnswers;
 }
