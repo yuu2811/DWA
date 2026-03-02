@@ -4,12 +4,12 @@ export const dietSection: QuestionSection = {
   domain: 'diet',
   title: '食事・栄養',
   description:
-    'ふだんの食生活についてお答えください。',
+    'ふだんの食生活についてお答えください。乗務日の食事パターンを中心にお考えください。',
   scaleName: '食事評価（特定健診質問票・MLIT健康管理マニュアル準拠）',
   questions: [
     {
       id: 'diet-1',
-      text: '朝食を毎日食べていますか',
+      text: '朝食を毎日食べていますか（早朝出発の日も含めて）',
       options: [
         { value: 0, label: 'ほとんど食べない' },
         { value: 1, label: '週に2〜3回食べる' },
@@ -31,7 +31,7 @@ export const dietSection: QuestionSection = {
     },
     {
       id: 'diet-3',
-      text: '1日の水分摂取量（水・お茶）はどのくらいですか',
+      text: '1日の水分摂取量（水・お茶）はどのくらいですか（運転中の摂取も含む）',
       options: [
         { value: 0, label: '500ml未満' },
         { value: 1, label: '500ml〜1L' },
@@ -53,7 +53,7 @@ export const dietSection: QuestionSection = {
     },
     {
       id: 'diet-5',
-      text: '食事の時間は規則的ですか',
+      text: '食事の時間は規則的ですか（シフト勤務・長距離運転の影響も含めて）',
       options: [
         { value: 0, label: '非常に不規則' },
         { value: 1, label: 'やや不規則' },
@@ -86,7 +86,7 @@ export const dietSection: QuestionSection = {
     },
     {
       id: 'diet-8',
-      text: 'カフェイン飲料（コーヒー・エナジードリンク等）の1日の摂取量は',
+      text: 'カフェイン飲料（コーヒー・エナジードリンク等）の1日の摂取量は（眠気覚まし目的を含む）',
       options: [
         { value: 4, label: '飲まないか1杯以下' },
         { value: 3, label: '2杯程度' },

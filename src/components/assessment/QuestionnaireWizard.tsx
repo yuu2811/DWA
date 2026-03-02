@@ -7,16 +7,18 @@ import { calculateOverallResult } from '@/lib/scoring/overall';
 import ProgressBar from './ProgressBar';
 import SleepSection from './SleepSection';
 import StressSection from './StressSection';
+import FatigueSection from './FatigueSection';
 import DietSection from './DietSection';
 import ExerciseSection from './ExerciseSection';
 
-const STEP_TITLES = ['睡眠', 'ストレス', '食事・栄養', '運動・身体活動'];
-const TOTAL_STEPS = 4;
+const STEP_TITLES = ['睡眠', 'ストレス', '疲労', '食事・栄養', '運動・身体活動'];
+const TOTAL_STEPS = 5;
 
 function createInitialAnswers(): AllAnswers {
   return {
     sleep: { items: Array(8).fill(undefined) },
     stress: { items: Array(6).fill(undefined) },
+    fatigue: { items: Array(13).fill(undefined) },
     diet: { items: Array(8).fill(undefined) },
     exercise: {
       vigorousDays: 0,
@@ -37,9 +39,11 @@ function isStepComplete(step: number, answers: AllAnswers): boolean {
     case 1:
       return answers.stress.items.every((v) => v !== undefined);
     case 2:
-      return answers.diet.items.every((v) => v !== undefined);
+      return answers.fatigue.items.every((v) => v !== undefined);
     case 3:
-      return true; // numeric inputs always have defaults
+      return answers.diet.items.every((v) => v !== undefined);
+    case 4:
+      return true;
     default:
       return false;
   }
@@ -103,12 +107,18 @@ export default function QuestionnaireWizard() {
           />
         )}
         {currentStep === 2 && (
+          <FatigueSection
+            answers={answers.fatigue}
+            onChange={(fatigue) => setAnswers({ ...answers, fatigue })}
+          />
+        )}
+        {currentStep === 3 && (
           <DietSection
             answers={answers.diet}
             onChange={(diet) => setAnswers({ ...answers, diet })}
           />
         )}
-        {currentStep === 3 && (
+        {currentStep === 4 && (
           <ExerciseSection
             answers={answers.exercise}
             onChange={(exercise) => setAnswers({ ...answers, exercise })}

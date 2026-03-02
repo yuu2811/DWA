@@ -39,7 +39,7 @@ export default function Home() {
             </div>
 
             <p className="text-slate-600 mb-6 leading-relaxed">
-              本ツールは、産業医・保健師がドライバーの健康状態を多角的にスクリーニングするための問診票です。学術的に妥当性が検証された尺度を用いて、以下の4領域を評価します。
+              本ツールは、産業医・保健師がドライバーの健康状態を多角的にスクリーニングするための問診票です。学術的に妥当性が検証された尺度を用いて、以下の5領域を評価します。
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
@@ -60,6 +60,17 @@ export default function Home() {
                   </p>
                   <p className="text-xs text-slate-500">
                     K6（ケスラー心理的苦痛尺度）
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-red-50">
+                <span className="text-lg mt-0.5">🔋</span>
+                <div>
+                  <p className="font-semibold text-slate-800 text-sm">
+                    疲労
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    疲労蓄積度チェックリスト（厚生労働省）
                   </p>
                 </div>
               </div>
@@ -89,7 +100,7 @@ export default function Home() {
 
             <div className="bg-slate-50 rounded-lg p-4 mb-8">
               <p className="text-sm text-slate-600">
-                <span className="font-semibold">所要時間：</span>約10分
+                <span className="font-semibold">所要時間：</span>約10〜15分
               </p>
               <p className="text-sm text-slate-600 mt-1">
                 <span className="font-semibold">対象：</span>

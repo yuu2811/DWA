@@ -3,6 +3,7 @@
 const steps = [
   { label: '睡眠', icon: '🌙' },
   { label: 'ストレス', icon: '🧠' },
+  { label: '疲労', icon: '🔋' },
   { label: '食事', icon: '🥗' },
   { label: '運動', icon: '🏃' },
 ];
@@ -19,7 +20,7 @@ export default function ProgressBar({ currentStep }: ProgressBarProps) {
           <div key={step.label} className="flex items-center flex-1">
             <div className="flex flex-col items-center flex-1">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 transition-colors ${
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-lg border-2 transition-colors ${
                   index < currentStep
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : index === currentStep
@@ -36,11 +37,11 @@ export default function ProgressBar({ currentStep }: ProgressBarProps) {
                     />
                   </svg>
                 ) : (
-                  <span className="text-sm">{step.icon}</span>
+                  <span className="text-xs sm:text-sm">{step.icon}</span>
                 )}
               </div>
               <span
-                className={`text-xs mt-1 font-medium ${
+                className={`text-[10px] sm:text-xs mt-1 font-medium ${
                   index <= currentStep ? 'text-blue-600' : 'text-slate-400'
                 }`}
               >
@@ -49,7 +50,7 @@ export default function ProgressBar({ currentStep }: ProgressBarProps) {
             </div>
             {index < steps.length - 1 && (
               <div
-                className={`h-0.5 flex-1 mx-1 -mt-5 ${
+                className={`h-0.5 flex-1 mx-0.5 sm:mx-1 -mt-5 ${
                   index < currentStep ? 'bg-blue-600' : 'bg-slate-200'
                 }`}
               />

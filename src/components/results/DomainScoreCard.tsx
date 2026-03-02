@@ -7,9 +7,10 @@ interface DomainScoreCardProps {
   result: DomainResult;
 }
 
-const domainColors = {
+const domainColors: Record<string, { bg: string; border: string; accent: string }> = {
   sleep: { bg: 'bg-blue-50', border: 'border-blue-200', accent: 'text-blue-600' },
   stress: { bg: 'bg-purple-50', border: 'border-purple-200', accent: 'text-purple-600' },
+  fatigue: { bg: 'bg-red-50', border: 'border-red-200', accent: 'text-red-600' },
   diet: { bg: 'bg-green-50', border: 'border-green-200', accent: 'text-green-600' },
   exercise: { bg: 'bg-orange-50', border: 'border-orange-200', accent: 'text-orange-600' },
 };

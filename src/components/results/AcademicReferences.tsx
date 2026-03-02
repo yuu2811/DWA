@@ -2,15 +2,16 @@
 
 import { academicReferences } from '@/lib/references';
 
-const domainLabels = {
+const domainLabels: Record<string, string> = {
   sleep: '睡眠',
   stress: 'ストレス',
+  fatigue: '疲労',
   diet: '食事・栄養',
   exercise: '運動・身体活動',
 };
 
 export default function AcademicReferences() {
-  const domains = ['sleep', 'stress', 'diet', 'exercise'] as const;
+  const domains = ['sleep', 'stress', 'fatigue', 'diet', 'exercise'] as const;
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5 md:p-6">
