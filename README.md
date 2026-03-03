@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DWA - Driver Wellness Assessment
 
-## Getting Started
+産業医・保健師がドライバー（トラック・バス・タクシー等）の健康面談で使用する Web ベースの健康スクリーニングツールです。
 
-First, run the development server:
+学術的に妥当性が検証された 5 つの尺度を用い、スコアリングに基づくリスク分類と具体的な受診勧奨・アクションプランを自動生成します。
+
+---
+
+## 評価領域
+
+| # | 領域 | 使用尺度 | 項目数 | スコア範囲 | リスク判定基準 |
+|---|------|----------|--------|-----------|---------------|
+| 1 | 睡眠 | ESS（エプワース眠気尺度） | 8 | 0〜24 点 | ≥11: 中リスク / ≥16: 高リスク |
+| 2 | ストレス | K6（ケスラー心理的苦痛尺度） | 6 | 0〜24 点 | ≥5: 中リスク / ≥13: 高リスク |
+| 3 | 疲労 | 疲労蓄積度自己診断CL（厚労省） | 13 | 0〜39 点 | ≥5: 中リスク / ≥15: 高リスク |
+| 4 | 食事・栄養 | 食事評価（特定健診・MLIT準拠） | 8 | 0〜32 点 | ≤19: 中リスク / ≤11: 高リスク |
+| 5 | 運動・身体活動 | IPAQ-SF（国際標準化身体活動質問票） | 7 | MET-分/週 | <3000: 中リスク / <600: 高リスク |
+
+**合計 42 項目**（所要時間: 約 10〜15 分）
+
+---
+
+## 主な機能
+
+- **5 領域の標準化された健康評価** — 学術尺度に基づくスコアリングとリスク分類
+- **レーダーチャート** — 5 領域のバランスを SVG ペンタゴンチャートで可視化
+- **アクションプラン自動生成** — リスクレベルに応じた具体的行動（SAS スクリーニング、受診勧奨、栄養指導 等）
+- **受診勧奨バナー** — 高リスク領域がある場合に目立つ表示
+- **印刷対応** — `@media print` による白背景自動切替、産業医がそのまま使えるレポート形式
+- **完全クライアントサイド** — データはブラウザ内（`sessionStorage`）で完結、外部通信なし
+- **ダークテーマ UI** — グラスモーフィズム・グローエフェクトによるモダンなデザイン
+
+---
+
+## 技術スタック
+
+| 技術 | バージョン | 用途 |
+|------|-----------|------|
+| Next.js | 14.x (App Router) | フレームワーク |
+| React | 18.x | UI ライブラリ |
+| TypeScript | 5.x | 型安全性 |
+| Tailwind CSS | 3.4.x | スタイリング |
+
+外部ランタイムライブラリへの依存なし（React / Next.js / Tailwind のみ）。
+
+---
+
+## セットアップ
 
 ```bash
+# 依存パッケージのインストール
+npm install
+
+# 開発サーバーの起動
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# 本番ビルド
+npm run build
+
+# 本番サーバーの起動
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 でアクセスできます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ページ構成
 
-## Learn More
+| パス | 内容 |
+|------|------|
+| `/` | ランディングページ — プロジェクト概要、5 領域紹介カード、診断開始 CTA |
+| `/assessment` | 問診ページ — 5 ステップウィザード形式（睡眠→ストレス→疲労→食事→運動） |
+| `/results` | 結果ページ — 総合判定、レーダーチャート、アクションプラン、領域別スコア、学術的根拠 |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 設計ドキュメント
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| ドキュメント | 内容 |
+|-------------|------|
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | アーキテクチャ設計書 — ディレクトリ構造、データフロー、デザインシステム |
+| [`docs/SCORING.md`](docs/SCORING.md) | スコアリング判定ロジック — 判定ツリー、閾値、アクションプラン生成 |
+| [`docs/SCALES.md`](docs/SCALES.md) | 使用尺度の学術的根拠 — 全 42 項目一覧、参考文献 14 件 |
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 免責事項
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+本ツールは健康スクリーニングを目的としたものであり、医学的診断を行うものではありません。評価結果の解釈および受診勧奨の最終判断は、必ず産業医等の医療専門職が行ってください。使用している尺度は学術的に妥当性が検証されたものですが、個々の状況により精度は異なります。

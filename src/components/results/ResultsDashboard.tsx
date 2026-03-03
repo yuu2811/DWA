@@ -1,9 +1,12 @@
 'use client';
 
+import { useMemo } from 'react';
 import { AssessmentResult } from '@/lib/types';
+import { generateActionPlan } from '@/lib/scoring/actionPlan';
 import RiskBadge from './RiskBadge';
 import DomainScoreCard from './DomainScoreCard';
 import RadarChart from './RadarChart';
+import ActionPlanPanel from './ActionPlanPanel';
 import AcademicReferences from './AcademicReferences';
 
 interface ResultsDashboardProps {
@@ -30,6 +33,7 @@ const riskTheme = {
 
 export default function ResultsDashboard({ result }: ResultsDashboardProps) {
   const theme = riskTheme[result.overallRisk];
+  const actionPlan = useMemo(() => generateActionPlan(result), [result]);
 
   return (
     <div className="space-y-8">
@@ -132,8 +136,13 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
         </div>
       )}
 
-      {/* Domain score cards */}
+      {/* Action Plan */}
       <div className="animate-fade-up animate-delay-2">
+        <ActionPlanPanel plan={actionPlan} />
+      </div>
+
+      {/* Domain score cards */}
+      <div className="animate-fade-up animate-delay-3">
         <h3 className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider font-semibold mb-4">
           領域別評価結果
         </h3>
@@ -145,7 +154,7 @@ export default function ResultsDashboard({ result }: ResultsDashboardProps) {
       </div>
 
       {/* Academic references */}
-      <div className="print-break animate-fade-up animate-delay-3">
+      <div className="print-break animate-fade-up animate-delay-4">
         <AcademicReferences />
       </div>
 
