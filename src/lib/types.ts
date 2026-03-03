@@ -72,6 +72,44 @@ export interface AssessmentResult {
   overallSummary: string;
 }
 
+// --- Action Plan types ---
+
+export type ActionPriority = 'urgent' | 'recommended' | 'optional';
+
+export type ActionCategory =
+  | 'medical_referral'
+  | 'screening'
+  | 'consultation'
+  | 'lifestyle_guidance'
+  | 'follow_up'
+  | 'self_care';
+
+export type ActionActor =
+  | 'occupational_physician'
+  | 'specialist'
+  | 'public_health_nurse'
+  | 'nutritionist'
+  | 'exercise_instructor'
+  | 'driver';
+
+export interface ActionItem {
+  id: string;
+  priority: ActionPriority;
+  category: ActionCategory;
+  title: string;
+  description: string;
+  actor: ActionActor;
+  actorLabel: string;
+  relatedDomains: DomainType[];
+  timeline: string;
+  checklist?: string[];
+}
+
+export interface ActionPlan {
+  actions: ActionItem[];
+  generatedDate: string;
+}
+
 export interface AcademicReference {
   id: string;
   domain: DomainType;
