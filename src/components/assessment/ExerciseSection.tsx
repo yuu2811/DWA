@@ -2,7 +2,10 @@
 
 import { ExerciseAnswers } from '@/lib/types';
 import { exerciseSection } from '@/lib/questions/exercise';
+import { DOMAIN_ACCENT } from '@/lib/constants';
 import LikertScale from './LikertScale';
+
+const accent = DOMAIN_ACCENT.exercise;
 
 interface ExerciseSectionProps {
   answers: ExerciseAnswers;
@@ -35,7 +38,7 @@ export default function ExerciseSection({ answers, onChange }: ExerciseSectionPr
   return (
     <div>
       <div className="mb-6">
-        <span className="inline-block text-[11px] font-medium text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg mb-2">
+        <span className={`inline-block text-[11px] font-medium ${accent.text} ${accent.bg} px-2.5 py-1 rounded-lg mb-2`}>
           {exerciseSection.scaleName}
         </span>
         <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{exerciseSection.description}</p>

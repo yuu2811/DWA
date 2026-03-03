@@ -15,21 +15,25 @@ export default function LikertScale({
   onChange,
   questionNumber,
 }: LikertScaleProps) {
+  const questionId = `q-${question.id}`;
+
   return (
-    <div className="py-5 border-b border-[var(--border-subtle)] last:border-b-0">
-      <p className="text-sm text-[var(--text-primary)] mb-3 leading-relaxed">
+    <fieldset className="py-5 border-b border-[var(--border-subtle)] last:border-b-0">
+      <legend className="text-sm text-[var(--text-primary)] mb-3 leading-relaxed" id={questionId}>
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-[var(--bg-card)] text-[var(--text-muted)] text-[11px] font-semibold mr-2.5 shrink-0">
           {questionNumber}
         </span>
         {question.text}
-      </p>
-      <div className="flex flex-wrap gap-2 pl-8">
+      </legend>
+      <div className="flex flex-wrap gap-2 pl-8" role="radiogroup" aria-labelledby={questionId}>
         {question.options.map((option) => {
           const selected = value === option.value;
           return (
             <button
               key={`${question.id}-${option.value}`}
               type="button"
+              role="radio"
+              aria-checked={selected}
               onClick={() => onChange(option.value)}
               className={`option-pill px-3.5 py-2 rounded-xl text-[13px] border transition-all
                 ${selected
@@ -43,6 +47,6 @@ export default function LikertScale({
           );
         })}
       </div>
-    </div>
+    </fieldset>
   );
 }

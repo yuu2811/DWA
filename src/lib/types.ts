@@ -110,6 +110,32 @@ export interface ActionPlan {
   generatedDate: string;
 }
 
+// --- Driver Profile & History types ---
+
+export type VehicleType = 'truck' | 'bus' | 'taxi' | 'other';
+
+export interface DriverProfile {
+  employeeId: string;
+  name: string;
+  age: number | null;
+  vehicleType: VehicleType;
+  yearsOfService: number | null;
+  company: string;
+}
+
+export interface StoredAssessment {
+  id: string;
+  date: string;
+  profile: DriverProfile;
+  result: AssessmentResult;
+  actionPlan: ActionPlan;
+  actionProgress: Record<string, boolean>;
+  notes?: string;
+  followUpDate?: string;
+}
+
+// --- Academic Reference type ---
+
 export interface AcademicReference {
   id: string;
   domain: DomainType;
