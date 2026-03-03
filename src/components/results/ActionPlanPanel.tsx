@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ActionItem, ActionPlan, ActionPriority } from '@/lib/types';
+import { getActionProgress, toggleActionComplete } from '@/lib/storage';
 
 interface ActionPlanPanelProps {
   plan: ActionPlan;
+  assessmentId?: string;
 }
 
 const priorityConfig: Record<
@@ -58,7 +60,7 @@ const actorIcons: Record<string, string> = {
   driver: '🚛',
 };
 
-function ActionCard({ action, index }: { action: ActionItem; index: number }) {
+function ActionCard({ action, index, completed, onToggle }: { action: ActionItem; index: number; completed: boolean; onToggle: () => void }) {
   const [expanded, setExpanded] = useState(action.priority === 'urgent');
   const cfg = priorityConfig[action.priority];
 
@@ -71,11 +73,26 @@ function ActionCard({ action, index }: { action: ActionItem; index: number }) {
       }}
     >
       {/* Header - always visible */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-3.5 flex items-start gap-3 text-left hover:bg-[var(--bg-card-hover)] transition-colors"
-      >
+      <div className="w-full px-4 py-3.5 flex items-start gap-3 text-left">
+        {/* Completion checkbox */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggle(); }}
+          className={`w-6 h-6 rounded-md border-2 flex items-center justify-center shrink-0 mt-1 transition-all ${
+            completed ? 'border-emerald-400 bg-emerald-400/20' : 'border-[var(--border-subtle)] hover:border-[var(--text-muted)]'
+          }`}
+        >
+          {completed && (
+            <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+        </button>
+
         {/* Priority indicator */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-start gap-3 flex-1 min-w-0 hover:opacity-80 transition-opacity"
+        >
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
           style={{ background: cfg.bg, color: cfg.color }}
@@ -119,7 +136,8 @@ function ActionCard({ action, index }: { action: ActionItem; index: number }) {
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
-      </button>
+        </button>
+      </div>
 
       {/* Expanded detail */}
       {expanded && (
@@ -160,7 +178,22 @@ function ActionCard({ action, index }: { action: ActionItem; index: number }) {
   );
 }
 
-export default function ActionPlanPanel({ plan }: ActionPlanPanelProps) {
+export default function ActionPlanPanel({ plan, assessmentId }: ActionPlanPanelProps) {
+  const [progress, setProgress] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (assessmentId) {
+      setProgress(getActionProgress(assessmentId));
+    }
+  }, [assessmentId]);
+
+  const handleToggle = useCallback((actionId: string) => {
+    if (!assessmentId) return;
+    const updated = toggleActionComplete(assessmentId, actionId);
+    setProgress({ ...updated });
+  }, [assessmentId]);
+
+  const completedCount = plan.actions.filter((a) => progress[a.id]).length;
   const urgentActions = plan.actions.filter((a) => a.priority === 'urgent');
   const recommendedActions = plan.actions.filter((a) => a.priority === 'recommended');
   const optionalActions = plan.actions.filter((a) => a.priority === 'optional');
@@ -188,7 +221,7 @@ export default function ActionPlanPanel({ plan }: ActionPlanPanelProps) {
               アクションプラン
             </h3>
             <p className="text-[11px] text-[var(--text-muted)]">
-              {plan.actions.length}件のアクション
+              {completedCount}/{plan.actions.length}件 完了
             </p>
           </div>
         </div>
@@ -222,6 +255,23 @@ export default function ActionPlanPanel({ plan }: ActionPlanPanelProps) {
         </div>
       </div>
 
+      {/* Progress bar */}
+      {assessmentId && plan.actions.length > 0 && (
+        <div>
+          <div className="progress-track rounded-full overflow-hidden" style={{ height: '4px' }}>
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${(completedCount / plan.actions.length) * 100}%`,
+                background: completedCount === plan.actions.length
+                  ? '#34d399'
+                  : 'linear-gradient(90deg, var(--accent-blue), var(--accent-purple))',
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Action groups */}
       {groups.map((group) => (
         <div key={group.key}>
@@ -237,7 +287,15 @@ export default function ActionPlanPanel({ plan }: ActionPlanPanelProps) {
           <div className="space-y-3">
             {group.actions.map((action) => {
               const idx = globalIndex++;
-              return <ActionCard key={action.id} action={action} index={idx} />;
+              return (
+                <ActionCard
+                  key={action.id}
+                  action={action}
+                  index={idx}
+                  completed={!!progress[action.id]}
+                  onToggle={() => handleToggle(action.id)}
+                />
+              );
             })}
           </div>
         </div>

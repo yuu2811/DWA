@@ -192,4 +192,22 @@ body {
   .glow-blue, .glow-emerald, .glow-rose, .glow-amber {
     box-shadow: none !important;
   }
+
+  /* Print report specific styles */
+  .print-report table {
+    font-size: 10px;
+  }
+
+  @page {
+    margin: 15mm;
+    size: A4;
+  }
+
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  table {
+    page-break-inside: avoid;
+  }
 }

@@ -1,19 +1,39 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { AssessmentResult } from '@/lib/types';
+import { AssessmentResult, StoredAssessment } from '@/lib/types';
+import { getAssessmentById, getPreviousAssessment } from '@/lib/storage';
+import { generateActionPlan } from '@/lib/scoring/actionPlan';
 import ResultsDashboard from '@/components/results/ResultsDashboard';
+import PrintReport from '@/components/results/PrintReport';
 
-export default function ResultsPage() {
+function ResultsContent() {
+  const searchParams = useSearchParams();
+  const assessmentId = searchParams.get('id');
+
   const [result, setResult] = useState<AssessmentResult | null>(null);
+  const [previous, setPrevious] = useState<StoredAssessment | null>(null);
+  const [currentStored, setCurrentStored] = useState<StoredAssessment | null>(null);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem('dwa-result');
-    if (stored) {
-      setResult(JSON.parse(stored));
+    if (assessmentId) {
+      // Load from localStorage history
+      const stored = getAssessmentById(assessmentId);
+      if (stored) {
+        setResult(stored.result);
+        setCurrentStored(stored);
+        setPrevious(getPreviousAssessment(assessmentId));
+        return;
+      }
     }
-  }, []);
+    // Fallback: load from sessionStorage (anonymous)
+    const sessionData = sessionStorage.getItem('dwa-result');
+    if (sessionData) {
+      setResult(JSON.parse(sessionData));
+    }
+  }, [assessmentId]);
 
   if (!result) {
     return (
@@ -75,6 +95,15 @@ export default function ResultsPage() {
               </span>
             </Link>
             <div className="flex items-center gap-2">
+              <Link
+                href="/history"
+                className="inline-flex items-center gap-2 px-4 py-2 glass rounded-xl text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                履歴
+              </Link>
               <button
                 onClick={() => window.print()}
                 className="inline-flex items-center gap-2 px-4 py-2 glass rounded-xl text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
@@ -104,11 +133,36 @@ export default function ResultsPage() {
               <p className="text-sm text-[var(--text-muted)]">
                 評価日: {result.assessmentDate}
               </p>
+              {currentStored?.profile && (
+                <p className="text-sm text-[var(--text-secondary)] mt-1">
+                  {currentStored.profile.name}
+                  {currentStored.profile.employeeId && ` (${currentStored.profile.employeeId})`}
+                  {currentStored.profile.company && ` / ${currentStored.profile.company}`}
+                </p>
+              )}
             </div>
-            <ResultsDashboard result={result} />
+            <ResultsDashboard
+              result={result}
+              previousResult={previous?.result ?? null}
+              assessmentId={assessmentId ?? undefined}
+            />
+            <PrintReport
+              result={result}
+              stored={currentStored}
+              actionPlan={generateActionPlan(result)}
+              previousResult={previous?.result ?? null}
+            />
           </div>
         </main>
       </div>
     </div>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense>
+      <ResultsContent />
+    </Suspense>
   );
 }

@@ -5,6 +5,7 @@ import RiskBadge from './RiskBadge';
 
 interface DomainScoreCardProps {
   result: DomainResult;
+  previousResult?: DomainResult;
 }
 
 const domainTheme: Record<string, { color: string; glow: string; label: string }> = {
@@ -61,11 +62,16 @@ function ScoreRing({ score, maxScore, color }: { score: number; maxScore: number
   );
 }
 
-export default function DomainScoreCard({ result }: DomainScoreCardProps) {
+export default function DomainScoreCard({ result, previousResult }: DomainScoreCardProps) {
   const theme = domainTheme[result.domain];
   const scoreDisplay = result.maxScore
     ? `${result.score} / ${result.maxScore} ${result.scoreUnit}`
     : `${result.score.toLocaleString()} ${result.scoreUnit}`;
+
+  // Delta calculation
+  const delta = previousResult ? result.score - previousResult.score : null;
+  const lowerIsBetter = ['sleep', 'stress', 'fatigue'].includes(result.domain);
+  const improved = delta !== null && delta !== 0 ? (lowerIsBetter ? delta < 0 : delta > 0) : null;
 
   return (
     <div
@@ -94,7 +100,20 @@ export default function DomainScoreCard({ result }: DomainScoreCardProps) {
           <ScoreRing score={result.score} maxScore={result.maxScore} color={theme.color} />
           <div>
             <p className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-1">スコア</p>
-            <p className="text-xl font-bold text-[var(--text-primary)]">{scoreDisplay}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xl font-bold text-[var(--text-primary)]">{scoreDisplay}</p>
+              {delta !== null && delta !== 0 && (
+                <span
+                  className="text-xs font-bold px-1.5 py-0.5 rounded-md"
+                  style={{
+                    background: improved ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.12)',
+                    color: improved ? '#34d399' : '#fb7185',
+                  }}
+                >
+                  {delta > 0 ? '+' : ''}{delta} {improved ? '↑改善' : '↓悪化'}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
