@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AssessmentResult, StoredAssessment } from '@/lib/types';
 import { generateActionPlan } from '@/lib/scoring/actionPlan';
 import { getHistory } from '@/lib/storage';
+import { LOWER_IS_BETTER_DOMAINS } from '@/lib/constants';
 import RiskBadge from './RiskBadge';
 import DomainScoreCard from './DomainScoreCard';
 import RadarChart from './RadarChart';
@@ -43,7 +44,7 @@ function getDomainDelta(current: AssessmentResult, previous: AssessmentResult) {
     if (!prev) return null;
     const delta = d.score - prev.score;
     // For sleep/stress/fatigue: lower is better. For diet/exercise: higher is better.
-    const lowerIsBetter = ['sleep', 'stress', 'fatigue'].includes(d.domain);
+    const lowerIsBetter = LOWER_IS_BETTER_DOMAINS.includes(d.domain);
     const improved = lowerIsBetter ? delta < 0 : delta > 0;
     return { domain: d.domain, domainLabel: d.domainLabel, delta, improved, neutral: delta === 0 };
   }).filter(Boolean) as { domain: string; domainLabel: string; delta: number; improved: boolean; neutral: boolean }[];
@@ -61,7 +62,6 @@ export default function ResultsDashboard({ result, previousResult, assessmentId 
   const deltas = previousResult ? getDomainDelta(result, previousResult) : null;
   const improvedCount = deltas?.filter((d) => d.improved && !d.neutral).length ?? 0;
   const worsedCount = deltas?.filter((d) => !d.improved && !d.neutral).length ?? 0;
-  void assessmentId;
 
   return (
     <div className="space-y-8">
@@ -217,9 +217,11 @@ export default function ResultsDashboard({ result, previousResult, assessmentId 
       </div>
 
       {/* Doctor notes */}
-      <div className="no-print animate-fade-up animate-delay-3">
-        <DoctorNotesPanel assessmentId={assessmentId} />
-      </div>
+      {assessmentId && (
+        <div className="no-print animate-fade-up animate-delay-3">
+          <DoctorNotesPanel assessmentId={assessmentId} />
+        </div>
+      )}
 
       {/* Academic references */}
       <div className="print-break animate-fade-up animate-delay-4">

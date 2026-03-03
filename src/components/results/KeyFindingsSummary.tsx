@@ -1,19 +1,12 @@
 'use client';
 
 import { AssessmentResult, DomainResult } from '@/lib/types';
+import { DOMAIN_COLORS } from '@/lib/constants';
 
 interface KeyFindingsSummaryProps {
   result: AssessmentResult;
   previousResult?: AssessmentResult | null;
 }
-
-const domainColors: Record<string, string> = {
-  sleep: '#638cff',
-  stress: '#a78bfa',
-  fatigue: '#fb7185',
-  diet: '#34d399',
-  exercise: '#fbbf24',
-};
 
 function getWorstDomain(domains: DomainResult[]): DomainResult | null {
   const high = domains.filter((d) => d.riskLevel === 'high');
@@ -118,7 +111,7 @@ export default function KeyFindingsSummary({ result, previousResult }: KeyFindin
 
           {worst && (
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full" style={{ background: domainColors[worst.domain] }} />
+              <span className="w-2 h-2 rounded-full" style={{ background: DOMAIN_COLORS[worst.domain] }} />
               <span className="text-sm text-[var(--text-secondary)]">
                 最も注意が必要: <strong className="text-[var(--text-primary)]">{worst.domainLabel}</strong>
                 {worst.referralDetail && ` — ${worst.referralDetail}`}

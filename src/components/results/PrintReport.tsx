@@ -1,4 +1,5 @@
 import { AssessmentResult, StoredAssessment, ActionPlan } from '@/lib/types';
+import { LOWER_IS_BETTER_DOMAINS } from '@/lib/constants';
 
 interface PrintReportProps {
   result: AssessmentResult;
@@ -20,7 +21,7 @@ export default function PrintReport({ result, stored, actionPlan, previousResult
         const prev = previousResult.domains.find((pd) => pd.domain === d.domain);
         if (!prev) return null;
         const delta = d.score - prev.score;
-        const lowerIsBetter = ['sleep', 'stress', 'fatigue'].includes(d.domain);
+        const lowerIsBetter = LOWER_IS_BETTER_DOMAINS.includes(d.domain);
         const improved = lowerIsBetter ? delta < 0 : delta > 0;
         return { domain: d.domain, delta, improved, neutral: delta === 0 };
       }).filter(Boolean) as { domain: string; delta: number; improved: boolean; neutral: boolean }[]

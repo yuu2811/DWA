@@ -1,6 +1,7 @@
 'use client';
 
 import { DomainResult } from '@/lib/types';
+import { LOWER_IS_BETTER_DOMAINS } from '@/lib/constants';
 import { useCountUp } from '@/hooks/useCountUp';
 import RiskBadge from './RiskBadge';
 
@@ -72,7 +73,7 @@ export default function DomainScoreCard({ result, previousResult }: DomainScoreC
 
   // Delta calculation
   const delta = previousResult ? result.score - previousResult.score : null;
-  const lowerIsBetter = ['sleep', 'stress', 'fatigue'].includes(result.domain);
+  const lowerIsBetter = LOWER_IS_BETTER_DOMAINS.includes(result.domain);
   const improved = delta !== null && delta !== 0 ? (lowerIsBetter ? delta < 0 : delta > 0) : null;
 
   return (

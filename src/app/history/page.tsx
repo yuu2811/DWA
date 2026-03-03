@@ -4,16 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { StoredAssessment } from '@/lib/types';
 import { getHistory, exportHistoryCSV, exportHistoryJSON } from '@/lib/storage';
-
-const riskConfig: Record<string, { text: string; color: string; bg: string; border: string }> = {
-  low: { text: '良好', color: '#34d399', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.2)' },
-  moderate: { text: '要改善', color: '#fbbf24', bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.2)' },
-  high: { text: '要対応', color: '#fb7185', bg: 'rgba(251,113,133,0.1)', border: 'rgba(251,113,133,0.2)' },
-};
-
-const domainColors: Record<string, string> = {
-  sleep: '#638cff', stress: '#a78bfa', fatigue: '#fb7185', diet: '#34d399', exercise: '#fbbf24',
-};
+import { RISK_CONFIG, DOMAIN_COLORS, LOWER_IS_BETTER_DOMAINS } from '@/lib/constants';
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -91,8 +82,8 @@ export default function HistoryPage() {
                 />
                 <StatCard
                   label="最新判定"
-                  value={riskConfig[history[0].result.overallRisk].text}
-                  color={riskConfig[history[0].result.overallRisk].color}
+                  value={RISK_CONFIG[history[0].result.overallRisk].text}
+                  color={RISK_CONFIG[history[0].result.overallRisk].color}
                 />
               </div>
 
@@ -138,7 +129,7 @@ export default function HistoryPage() {
           ) : (
             <div className="space-y-3">
               {history.map((assessment, idx) => {
-                const risk = riskConfig[assessment.result.overallRisk];
+                const risk = RISK_CONFIG[assessment.result.overallRisk];
                 const prev = idx < history.length - 1 ? history[idx + 1] : null; // previous in time (history is reversed)
 
                 return (
@@ -177,14 +168,14 @@ export default function HistoryPage() {
                         <div key={d.domain} className="flex items-center gap-1.5">
                           <span
                             className="w-2 h-2 rounded-full"
-                            style={{ background: domainColors[d.domain] }}
+                            style={{ background: DOMAIN_COLORS[d.domain] }}
                           />
                           <span className="text-[11px] text-[var(--text-muted)]">
                             {d.domainLabel}
                           </span>
                           <span
                             className="text-[10px] font-medium"
-                            style={{ color: riskConfig[d.riskLevel]?.color }}
+                            style={{ color: RISK_CONFIG[d.riskLevel]?.color }}
                           >
                             {d.score}{d.scoreUnit === '点' ? '' : ''}
                           </span>
@@ -195,7 +186,7 @@ export default function HistoryPage() {
                             const delta = d.score - prevDomain.score;
                             if (delta === 0) return null;
                             // For sleep/stress/fatigue: lower is better. For diet/exercise: higher is better.
-                            const lowerIsBetter = ['sleep', 'stress', 'fatigue'].includes(d.domain);
+                            const lowerIsBetter = LOWER_IS_BETTER_DOMAINS.includes(d.domain);
                             const improved = lowerIsBetter ? delta < 0 : delta > 0;
                             return (
                               <span className={`text-[9px] font-medium ${improved ? 'text-emerald-400' : 'text-rose-400'}`}>
@@ -221,7 +212,7 @@ export default function HistoryPage() {
               <div className="flex items-end gap-1" style={{ height: '60px' }}>
                 {history.slice().reverse().map((a, i) => {
                   const h = a.result.overallRisk === 'low' ? 20 : a.result.overallRisk === 'moderate' ? 40 : 60;
-                  const c = riskConfig[a.result.overallRisk].color;
+                  const c = RISK_CONFIG[a.result.overallRisk].color;
                   return (
                     <div key={a.id} className="flex-1 flex flex-col items-center gap-1">
                       <div
