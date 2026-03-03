@@ -130,6 +130,8 @@ export interface StoredAssessment {
   result: AssessmentResult;
   actionPlan: ActionPlan;
   actionProgress: Record<string, boolean>;
+  notes?: string;
+  followUpDate?: string;
 }
 
 // --- Academic Reference type ---

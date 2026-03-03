@@ -61,32 +61,7 @@ export default function Home() {
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
-        {/* Header */}
-        <header className="pt-8 pb-4 no-print">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                <span className="text-white text-xs font-black">D</span>
-              </div>
-              <span className="text-sm font-medium text-[var(--text-muted)] tracking-wider uppercase">
-                Driver Wellness Assessment
-              </span>
-            </div>
-            {mounted && historyCount > 0 && (
-              <Link
-                href="/history"
-                className="flex items-center gap-2 px-4 py-2 glass rounded-xl text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                履歴
-              </Link>
-            )}
-          </div>
-        </header>
-
-        <main className="pt-12 sm:pt-20 pb-20">
+        <main className="pt-8 sm:pt-16 pb-20">
           {/* Returning user card */}
           {isReturning && !showForm && (
             <div className="glass rounded-2xl p-6 mb-10 animate-fade-up border border-[var(--border-subtle)]">

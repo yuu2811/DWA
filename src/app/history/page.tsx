@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { StoredAssessment } from '@/lib/types';
-import { getHistory } from '@/lib/storage';
+import { getHistory, exportHistoryCSV, exportHistoryJSON } from '@/lib/storage';
 
 const riskConfig: Record<string, { text: string; color: string; bg: string; border: string }> = {
   low: { text: '良好', color: '#34d399', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.2)' },
@@ -21,6 +21,25 @@ function formatDate(iso: string) {
 
 function formatDateShort(iso: string) {
   return new Date(iso).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' });
+}
+
+function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div className="glass rounded-xl p-3 text-center">
+      <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-lg font-bold" style={{ color }}>{value}</p>
+    </div>
+  );
+}
+
+function downloadFile(content: string, filename: string, mimeType: string) {
+  const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 export default function HistoryPage() {
@@ -42,26 +61,6 @@ export default function HistoryPage() {
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6">
-        {/* Header */}
-        <header className="pt-8 pb-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                <span className="text-white text-xs font-black">D</span>
-              </div>
-              <span className="text-sm font-medium text-[var(--text-muted)] group-hover:text-[var(--text-primary)] tracking-wider uppercase transition-colors">
-                DWA
-              </span>
-            </Link>
-            <Link
-              href="/assessment"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white text-sm font-medium rounded-xl transition-all shadow-lg shadow-blue-600/20"
-            >
-              新しい診断
-            </Link>
-          </div>
-        </header>
-
         <main className="pt-8 pb-20">
           <div className="mb-8 animate-fade-up">
             <h1 className="text-2xl font-bold text-[var(--text-primary)]">診断履歴</h1>
@@ -69,6 +68,57 @@ export default function HistoryPage() {
               過去の診断結果を確認・比較できます（{history.length}件）
             </p>
           </div>
+
+          {/* Statistics + Export */}
+          {history.length > 0 && (
+            <div className="mb-6 space-y-4 animate-fade-up">
+              {/* Statistics cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <StatCard
+                  label="診断回数"
+                  value={`${history.length}回`}
+                  color="#638cff"
+                />
+                <StatCard
+                  label="良好率"
+                  value={`${Math.round((history.filter((a) => a.result.overallRisk === 'low').length / history.length) * 100)}%`}
+                  color="#34d399"
+                />
+                <StatCard
+                  label="要対応"
+                  value={`${history.filter((a) => a.result.overallRisk === 'high').length}回`}
+                  color="#fb7185"
+                />
+                <StatCard
+                  label="最新判定"
+                  value={riskConfig[history[0].result.overallRisk].text}
+                  color={riskConfig[history[0].result.overallRisk].color}
+                />
+              </div>
+
+              {/* Export buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => downloadFile(exportHistoryCSV(), 'dwa-history.csv', 'text/csv')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 glass rounded-lg text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  CSV出力
+                </button>
+                <button
+                  onClick={() => downloadFile(exportHistoryJSON(), 'dwa-history.json', 'application/json')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 glass rounded-lg text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  JSON出力
+                </button>
+              </div>
+            </div>
+          )}
 
           {history.length === 0 ? (
             <div className="text-center py-20 animate-fade-up">

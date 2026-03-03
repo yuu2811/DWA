@@ -125,3 +125,114 @@ export function clearDraft(): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(KEYS.draft);
 }
+
+// --- Notes ---
+
+export function saveNotes(assessmentId: string, notes: string): void {
+  const history = getHistory();
+  const idx = history.findIndex((a) => a.id === assessmentId);
+  if (idx === -1) return;
+  history[idx].notes = notes;
+  write(KEYS.history, history);
+}
+
+export function saveFollowUpDate(assessmentId: string, followUpDate: string): void {
+  const history = getHistory();
+  const idx = history.findIndex((a) => a.id === assessmentId);
+  if (idx === -1) return;
+  history[idx].followUpDate = followUpDate;
+  write(KEYS.history, history);
+}
+
+// --- Export ---
+
+export function exportHistoryJSON(): string {
+  const data = {
+    exportDate: new Date().toISOString(),
+    profile: getProfile(),
+    history: getHistory(),
+  };
+  return JSON.stringify(data, null, 2);
+}
+
+export function exportHistoryCSV(): string {
+  const history = getHistory();
+  if (history.length === 0) return '';
+
+  const headers = [
+    '評価日', '氏名', '社員番号', '所属', '総合判定',
+    '睡眠スコア', '睡眠判定',
+    'ストレススコア', 'ストレス判定',
+    '疲労スコア', '疲労判定',
+    '食事スコア', '食事判定',
+    '運動スコア', '運動判定',
+    '受診勧奨', '所見メモ',
+  ];
+
+  const riskLabel: Record<string, string> = { low: '良好', moderate: '要改善', high: '要対応' };
+
+  const rows = history.map((entry) => {
+    const domainMap: Record<string, { score: number; risk: string }> = {};
+    for (const d of entry.result.domains) {
+      domainMap[d.domain] = { score: d.score, risk: riskLabel[d.riskLevel] ?? d.riskLevel };
+    }
+    return [
+      entry.result.assessmentDate,
+      entry.profile.name,
+      entry.profile.employeeId,
+      entry.profile.company,
+      riskLabel[entry.result.overallRisk] ?? entry.result.overallRisk,
+      domainMap['sleep']?.score ?? '',
+      domainMap['sleep']?.risk ?? '',
+      domainMap['stress']?.score ?? '',
+      domainMap['stress']?.risk ?? '',
+      domainMap['fatigue']?.score ?? '',
+      domainMap['fatigue']?.risk ?? '',
+      domainMap['diet']?.score ?? '',
+      domainMap['diet']?.risk ?? '',
+      domainMap['exercise']?.score ?? '',
+      domainMap['exercise']?.risk ?? '',
+      entry.result.referralRecommended ? 'あり' : 'なし',
+      (entry.notes ?? '').replace(/"/g, '""'),
+    ].map((v) => `"${v}"`).join(',');
+  });
+
+  return '\uFEFF' + [headers.join(','), ...rows].join('\n');
+}
+
+// --- Import / Clear ---
+
+export function importData(json: string): { success: boolean; count: number } {
+  try {
+    const data = JSON.parse(json);
+    if (data.profile) {
+      saveProfile(data.profile);
+    }
+    if (Array.isArray(data.history)) {
+      const existing = getHistory();
+      const existingIds = new Set(existing.map((e) => e.id));
+      const newEntries = data.history.filter((e: StoredAssessment) => !existingIds.has(e.id));
+      const merged = [...existing, ...newEntries].slice(-MAX_HISTORY);
+      write(KEYS.history, merged);
+      return { success: true, count: newEntries.length };
+    }
+    return { success: true, count: 0 };
+  } catch {
+    return { success: false, count: 0 };
+  }
+}
+
+export function clearAllData(): void {
+  if (typeof window === 'undefined') return;
+  Object.values(KEYS).forEach((key) => localStorage.removeItem(key));
+}
+
+export function deleteAssessment(assessmentId: string): void {
+  const history = getHistory();
+  const filtered = history.filter((a) => a.id !== assessmentId);
+  write(KEYS.history, filtered);
+  // Also clean up action progress
+  const all = read<Record<string, Record<string, boolean>>>(KEYS.actionProgress) ?? {};
+  delete all[assessmentId];
+  write(KEYS.actionProgress, all);
+}

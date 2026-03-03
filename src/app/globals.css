@@ -155,6 +155,11 @@ body {
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Safe area for mobile nav */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* Print */
 @media print {
   :root {

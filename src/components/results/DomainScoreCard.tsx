@@ -1,6 +1,7 @@
 'use client';
 
 import { DomainResult } from '@/lib/types';
+import { useCountUp } from '@/hooks/useCountUp';
 import RiskBadge from './RiskBadge';
 
 interface DomainScoreCardProps {
@@ -16,10 +17,10 @@ const domainTheme: Record<string, { color: string; glow: string; label: string }
   exercise: { color: '#fbbf24', glow: 'var(--glow-amber)', label: 'border-amber-500/20' },
 };
 
-function ScoreRing({ score, maxScore, color }: { score: number; maxScore: number | null; color: string }) {
+function ScoreRing({ score, animatedScore, maxScore, color }: { score: number; animatedScore: number; maxScore: number | null; color: string }) {
   const radius = 32;
   const circumference = 2 * Math.PI * radius;
-  const ratio = maxScore ? Math.min(score / maxScore, 1) : 0.5;
+  const ratio = maxScore ? Math.min(animatedScore / maxScore, 1) : Math.min(animatedScore / Math.max(score, 1), 0.5);
   const offset = circumference * (1 - ratio);
 
   return (
@@ -43,7 +44,7 @@ function ScoreRing({ score, maxScore, color }: { score: number; maxScore: number
         fill="var(--text-primary)"
         transform="rotate(90 40 40)"
       >
-        {score}
+        {animatedScore}
       </text>
       {maxScore && (
         <text
@@ -64,9 +65,10 @@ function ScoreRing({ score, maxScore, color }: { score: number; maxScore: number
 
 export default function DomainScoreCard({ result, previousResult }: DomainScoreCardProps) {
   const theme = domainTheme[result.domain];
+  const animatedScore = useCountUp(result.score, 1200, 200);
   const scoreDisplay = result.maxScore
-    ? `${result.score} / ${result.maxScore} ${result.scoreUnit}`
-    : `${result.score.toLocaleString()} ${result.scoreUnit}`;
+    ? `${animatedScore} / ${result.maxScore} ${result.scoreUnit}`
+    : `${animatedScore.toLocaleString()} ${result.scoreUnit}`;
 
   // Delta calculation
   const delta = previousResult ? result.score - previousResult.score : null;
@@ -97,7 +99,7 @@ export default function DomainScoreCard({ result, previousResult }: DomainScoreC
       <div className="px-5 py-4 space-y-4">
         {/* Score display */}
         <div className="flex items-center gap-4">
-          <ScoreRing score={result.score} maxScore={result.maxScore} color={theme.color} />
+          <ScoreRing score={result.score} animatedScore={animatedScore} maxScore={result.maxScore} color={theme.color} />
           <div>
             <p className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-1">スコア</p>
             <div className="flex items-center gap-2">

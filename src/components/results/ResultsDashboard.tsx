@@ -10,6 +10,8 @@ import RadarChart from './RadarChart';
 import TrendChart from './TrendChart';
 import ActionPlanPanel from './ActionPlanPanel';
 import AcademicReferences from './AcademicReferences';
+import KeyFindingsSummary from './KeyFindingsSummary';
+import DoctorNotesPanel from './DoctorNotesPanel';
 
 interface ResultsDashboardProps {
   result: AssessmentResult;
@@ -88,6 +90,9 @@ export default function ResultsDashboard({ result, previousResult, assessmentId 
           </div>
         </div>
       )}
+
+      {/* Key findings summary */}
+      <KeyFindingsSummary result={result} previousResult={previousResult} />
 
       {/* Overall assessment + Radar chart */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-up">
@@ -209,6 +214,11 @@ export default function ResultsDashboard({ result, previousResult, assessmentId 
             );
           })}
         </div>
+      </div>
+
+      {/* Doctor notes */}
+      <div className="no-print animate-fade-up animate-delay-3">
+        <DoctorNotesPanel assessmentId={assessmentId} />
       </div>
 
       {/* Academic references */}

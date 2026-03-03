@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Navigation from '@/components/shared/Navigation';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -26,7 +27,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className="antialiased min-h-screen">
+      <body className="antialiased min-h-screen pb-16 sm:pb-0">
+        <Navigation />
         {children}
       </body>
     </html>
