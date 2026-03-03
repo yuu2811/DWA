@@ -8,13 +8,9 @@ interface RadarChartProps {
 }
 
 const LABELS = ['睡眠', 'ストレス', '疲労', '食事', '運動'];
-const COLORS = {
-  sleep: '#638cff',
-  stress: '#a78bfa',
-  fatigue: '#fb7185',
-  diet: '#34d399',
-  exercise: '#fbbf24',
-};
+import { DOMAIN_COLORS } from '@/lib/constants';
+
+const COLORS = DOMAIN_COLORS;
 
 function riskToValue(level: string): number {
   switch (level) {
@@ -94,8 +90,8 @@ export default function RadarChart({ domains, previousDomains }: RadarChartProps
     : null;
 
   return (
-    <div className="flex justify-center">
-      <svg viewBox="0 0 300 300" className="w-full max-w-[320px]">
+    <div className="flex justify-center" role="img" aria-label={`5領域バランスチャート: ${domains.map(d => `${LABELS[domains.indexOf(d)]} ${d.riskLevel === 'low' ? '良好' : d.riskLevel === 'moderate' ? '要改善' : '要対応'}`).join('、')}`}>
+      <svg viewBox="0 0 300 300" className="w-full max-w-[320px]" aria-hidden="true">
         {gridPaths.map((d, i) => (
           <path key={i} d={d} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
         ))}

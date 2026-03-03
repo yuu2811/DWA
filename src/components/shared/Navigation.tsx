@@ -56,7 +56,7 @@ export default function Navigation() {
   if (pathname.startsWith('/results')) return null;
 
   return (
-    <nav className="no-print fixed bottom-0 left-0 right-0 z-50 sm:relative sm:bottom-auto">
+    <nav className="no-print fixed bottom-0 left-0 right-0 z-50 sm:relative sm:bottom-auto" aria-label="メインナビゲーション">
       {/* Mobile bottom nav */}
       <div className="sm:hidden glass border-t border-[var(--border-subtle)] px-2 py-1 safe-area-bottom">
         <div className="flex items-center justify-around">
@@ -66,6 +66,7 @@ export default function Navigation() {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={isActive ? 'page' : undefined}
                 className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all ${
                   isActive
                     ? 'text-[var(--accent-blue)]'
@@ -98,6 +99,7 @@ export default function Navigation() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     isActive
                       ? 'text-[var(--accent-blue)] bg-blue-500/10'

@@ -16,11 +16,16 @@ export default function ProgressBar({ currentStep }: ProgressBarProps) {
   const progress = (currentStep / (steps.length - 1)) * 100;
 
   return (
-    <div className="mb-10">
+    <div className="mb-10" role="navigation" aria-label="問診の進捗">
       {/* Track */}
       <div className="progress-track rounded-full mb-5">
         <div
           className="progress-track-fill rounded-full"
+          role="progressbar"
+          aria-valuenow={currentStep + 1}
+          aria-valuemin={1}
+          aria-valuemax={steps.length}
+          aria-label={`ステップ ${currentStep + 1} / ${steps.length}: ${steps[currentStep].label}`}
           style={{ width: `${progress}%` }}
         />
       </div>

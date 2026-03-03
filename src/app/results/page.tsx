@@ -8,6 +8,8 @@ import { getAssessmentById, getPreviousAssessment } from '@/lib/storage';
 import { generateActionPlan } from '@/lib/scoring/actionPlan';
 import ResultsDashboard from '@/components/results/ResultsDashboard';
 import PrintReport from '@/components/results/PrintReport';
+import ErrorBoundary from '@/components/shared/ErrorBoundary';
+import { ResultsLoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 
 function ResultsContent() {
   const searchParams = useSearchParams();
@@ -161,8 +163,14 @@ function ResultsContent() {
 
 export default function ResultsPage() {
   return (
-    <Suspense>
-      <ResultsContent />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-12">
+          <ResultsLoadingSkeleton />
+        </div>
+      }>
+        <ResultsContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import QuestionnaireWizard from '@/components/assessment/QuestionnaireWizard';
+import ErrorBoundary from '@/components/shared/ErrorBoundary';
 
 export default function AssessmentPage() {
   return (
@@ -24,7 +25,9 @@ export default function AssessmentPage() {
 
       <main className="px-4 sm:px-6 pb-12">
         <div className="max-w-3xl mx-auto">
-          <QuestionnaireWizard />
+          <ErrorBoundary>
+            <QuestionnaireWizard />
+          </ErrorBoundary>
         </div>
       </main>
     </div>

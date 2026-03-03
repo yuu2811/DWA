@@ -1,4 +1,4 @@
-import { RiskLevel } from './types';
+import { DomainType, RiskLevel } from './types';
 
 export const DOMAIN_COLORS: Record<string, string> = {
   sleep: '#638cff',
@@ -6,6 +6,15 @@ export const DOMAIN_COLORS: Record<string, string> = {
   fatigue: '#fb7185',
   diet: '#34d399',
   exercise: '#fbbf24',
+};
+
+/** Tailwind-compatible accent classes per domain (text color + badge bg) */
+export const DOMAIN_ACCENT: Record<DomainType, { text: string; bg: string }> = {
+  sleep: { text: 'text-blue-400', bg: 'bg-blue-500/10' },
+  stress: { text: 'text-purple-400', bg: 'bg-purple-500/10' },
+  fatigue: { text: 'text-rose-400', bg: 'bg-rose-500/10' },
+  diet: { text: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  exercise: { text: 'text-amber-400', bg: 'bg-amber-500/10' },
 };
 
 export const RISK_CONFIG: Record<RiskLevel, { text: string; color: string; bg: string; border: string }> = {
