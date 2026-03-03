@@ -82,8 +82,8 @@ export default function SettingsPage() {
       <div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6">
         <main className="pt-8 pb-20">
           <div className="mb-8 animate-fade-up">
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">設定</h1>
-            <p className="text-sm text-[var(--text-secondary)] mt-1">
+            <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">設定</h1>
+            <p className="text-sm text-[var(--text-secondary)] mt-1.5">
               プロフィール編集・データ管理
             </p>
           </div>

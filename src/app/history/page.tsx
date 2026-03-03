@@ -16,9 +16,9 @@ function formatDateShort(iso: string) {
 
 function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="glass rounded-xl p-3 text-center">
-      <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">{label}</p>
-      <p className="text-lg font-bold" style={{ color }}>{value}</p>
+    <div className="glass rounded-xl p-4 text-center card-hover">
+      <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1.5 font-medium">{label}</p>
+      <p className="text-xl font-black tabular-nums" style={{ color }}>{value}</p>
     </div>
   );
 }
@@ -54,9 +54,10 @@ export default function HistoryPage() {
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6">
         <main className="pt-8 pb-20">
           <div className="mb-8 animate-fade-up">
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">診断履歴</h1>
-            <p className="text-sm text-[var(--text-secondary)] mt-1">
-              過去の診断結果を確認・比較できます（{history.length}件）
+            <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">診断履歴</h1>
+            <p className="text-sm text-[var(--text-secondary)] mt-1.5">
+              過去の診断結果を確認・比較できます
+              <span className="ml-1.5 text-[11px] text-[var(--text-muted)] bg-[var(--bg-card)] px-2 py-0.5 rounded-md">{history.length}件</span>
             </p>
           </div>
 
@@ -136,7 +137,7 @@ export default function HistoryPage() {
                   <Link
                     key={assessment.id}
                     href={`/results?id=${assessment.id}`}
-                    className="block glass rounded-2xl p-5 hover:bg-[var(--bg-card-hover)] transition-all animate-fade-up group"
+                    className="block glass rounded-2xl p-5 card-hover animate-fade-up group"
                     style={{ animationDelay: `${Math.min(idx * 0.05, 0.3)}s` }}
                   >
                     <div className="flex items-start justify-between mb-3">

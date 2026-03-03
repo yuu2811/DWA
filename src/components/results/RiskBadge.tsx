@@ -32,9 +32,9 @@ const config = {
 };
 
 const sizeClasses = {
-  sm: 'text-[11px] px-2.5 py-1 gap-1.5',
-  md: 'text-xs px-3 py-1.5 gap-1.5',
-  lg: 'text-sm px-4 py-2 gap-2',
+  sm: 'text-[10px] px-2.5 py-1 gap-1.5',
+  md: 'text-[11px] px-3 py-1.5 gap-1.5',
+  lg: 'text-[13px] px-4 py-2 gap-2',
 };
 
 const dotSizes = {
@@ -47,7 +47,7 @@ export default function RiskBadge({ level, size = 'md' }: RiskBadgeProps) {
   const c = config[level];
   return (
     <span
-      className={`inline-flex items-center font-semibold rounded-full tracking-wide ${sizeClasses[size]}`}
+      className={`inline-flex items-center font-bold rounded-full tracking-wide ${sizeClasses[size]}`}
       style={{
         background: c.bg,
         border: `1px solid ${c.border}`,

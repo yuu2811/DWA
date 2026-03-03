@@ -190,12 +190,12 @@ export default function QuestionnaireWizard() {
     <div>
       <ProgressBar currentStep={currentStep} />
 
-      <div className="glass rounded-2xl p-6 md:p-8 animate-scale-in">
+      <div className="glass-elevated rounded-2xl p-6 md:p-8 animate-scale-in">
         {/* Section header */}
         <div className="flex items-end justify-between mb-8">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <p className="text-[11px] font-medium text-[var(--text-muted)] tracking-wider uppercase">
+            <div className="flex items-center gap-2 mb-1.5">
+              <p className="text-[11px] font-medium text-[var(--accent-blue)] tracking-wider uppercase">
                 Step {currentStep + 1} of {TOTAL_STEPS}
               </p>
               {draftSaved && (
@@ -207,14 +207,15 @@ export default function QuestionnaireWizard() {
                 </span>
               )}
             </div>
-            <h2 className="text-2xl font-bold text-[var(--text-primary)]">
+            <h2 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">
               {STEP_TITLES[currentStep]}
             </h2>
           </div>
           {currentStep < 4 && (
-            <span className="text-xs text-[var(--text-muted)] tabular-nums">
-              {answered}/{total}
-            </span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--bg-card)]">
+              <span className="text-xs font-bold tabular-nums text-[var(--text-primary)]">{answered}</span>
+              <span className="text-[10px] text-[var(--text-muted)]">/ {total}</span>
+            </div>
           )}
         </div>
 

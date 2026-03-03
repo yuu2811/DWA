@@ -32,7 +32,7 @@ function polarToCartesian(cx: number, cy: number, r: number, angleInDegrees: num
 export default function RadarChart({ domains, previousDomains }: RadarChartProps) {
   const cx = 150;
   const cy = 150;
-  const maxR = 110;
+  const maxR = 105;
   const sides = 5;
   const angleStep = 360 / sides;
 
@@ -73,7 +73,7 @@ export default function RadarChart({ domains, previousDomains }: RadarChartProps
   }
 
   const labelPositions = Array.from({ length: sides }, (_, i) => {
-    const { x, y } = polarToCartesian(cx, cy, maxR + 28, angleStep * i);
+    const { x, y } = polarToCartesian(cx, cy, maxR + 30, angleStep * i);
     return { x, y };
   });
 
@@ -92,43 +92,81 @@ export default function RadarChart({ domains, previousDomains }: RadarChartProps
   return (
     <div className="flex justify-center" role="img" aria-label={`5領域バランスチャート: ${domains.map(d => `${LABELS[domains.indexOf(d)]} ${d.riskLevel === 'low' ? '良好' : d.riskLevel === 'moderate' ? '要改善' : '要対応'}`).join('、')}`}>
       <svg viewBox="0 0 300 300" className="w-full max-w-[320px]" aria-hidden="true">
+        <defs>
+          <linearGradient id="radarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#638cff" />
+            <stop offset="50%" stopColor="#a78bfa" />
+            <stop offset="100%" stopColor="#34d399" />
+          </linearGradient>
+          <linearGradient id="radarStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#638cff" />
+            <stop offset="50%" stopColor="#a78bfa" />
+            <stop offset="100%" stopColor="#34d399" />
+          </linearGradient>
+          <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="rgba(99,140,255,0.08)" />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+          {/* Point glow filters */}
+          {domains.map((d) => {
+            const color = COLORS[d.domain as keyof typeof COLORS];
+            return (
+              <filter key={d.domain} id={`glow-${d.domain}`} x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor={color} floodOpacity="0.6" />
+              </filter>
+            );
+          })}
+        </defs>
+
+        {/* Center glow */}
+        <circle cx={cx} cy={cy} r={maxR} fill="url(#centerGlow)" />
+
+        {/* Grid rings */}
         {gridPaths.map((d, i) => (
-          <path key={i} d={d} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
+          <path key={i} d={d} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={i === 3 ? 1.5 : 0.5} />
         ))}
 
+        {/* Axes */}
         {axes.map((a, i) => (
-          <line key={i} {...a} stroke="rgba(255,255,255,0.04)" strokeWidth={1} />
+          <line key={i} {...a} stroke="rgba(255,255,255,0.03)" strokeWidth={0.5} />
         ))}
 
         {/* Previous polygon (dashed) */}
         {prevPath && (
-          <path d={prevPath} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth={1.5} strokeDasharray="4 3" className="radar-polygon" />
+          <path d={prevPath} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={1.5} strokeDasharray="4 3" className="radar-polygon" />
         )}
 
-        {/* Current polygon */}
-        <path d={dataPath} fill="url(#radarGradient)" fillOpacity={0.2} stroke="url(#radarStroke)" strokeWidth={2} className="radar-polygon" />
+        {/* Current polygon area fill */}
+        <path d={dataPath} fill="url(#radarGradient)" fillOpacity={0.12} className="radar-polygon" />
+        {/* Current polygon stroke */}
+        <path d={dataPath} fill="none" stroke="url(#radarStroke)" strokeWidth={2} strokeLinejoin="round" className="radar-polygon" />
 
         {/* Previous points */}
         {prevDataPoints.map((p, i) => (
-          <circle key={`prev-${i}`} cx={p.x} cy={p.y} r={2.5} fill="rgba(255,255,255,0.3)" stroke="var(--bg-primary)" strokeWidth={1.5} />
+          <circle key={`prev-${i}`} cx={p.x} cy={p.y} r={2.5} fill="rgba(255,255,255,0.25)" stroke="var(--bg-primary)" strokeWidth={1.5} />
         ))}
 
-        {/* Current points */}
+        {/* Current points with glow */}
         {dataPoints.map((p, i) => {
           const domainKey = domains[i].domain;
           const color = COLORS[domainKey as keyof typeof COLORS] || '#638cff';
-          return <circle key={i} cx={p.x} cy={p.y} r={4} fill={color} stroke="var(--bg-primary)" strokeWidth={2} />;
+          return (
+            <g key={i}>
+              <circle cx={p.x} cy={p.y} r={5} fill={color} fillOpacity={0.2} filter={`url(#glow-${domainKey})`} />
+              <circle cx={p.x} cy={p.y} r={4} fill={color} stroke="var(--bg-primary)" strokeWidth={2} />
+            </g>
+          );
         })}
 
         {/* Labels with change arrows */}
         {labelPositions.map((pos, i) => (
           <g key={i}>
-            <text x={pos.x} y={pos.y} textAnchor="middle" dominantBaseline="middle" className="text-[11px] font-medium" fill="var(--text-secondary)">
+            <text x={pos.x} y={pos.y} textAnchor="middle" dominantBaseline="middle" className="text-[11px] font-semibold" fill="var(--text-secondary)">
               {LABELS[i]}
             </text>
             {changes && changes[i] && (
               <text
-                x={pos.x + (pos.x > cx ? 18 : -18)}
+                x={pos.x + (pos.x > cx ? 20 : -20)}
                 y={pos.y}
                 textAnchor="middle"
                 dominantBaseline="middle"
@@ -144,23 +182,10 @@ export default function RadarChart({ domains, previousDomains }: RadarChartProps
         {/* Legend for previous */}
         {previousDomains && (
           <g>
-            <line x1="20" y1="285" x2="36" y2="285" stroke="rgba(255,255,255,0.25)" strokeWidth={1.5} strokeDasharray="4 3" />
+            <line x1="20" y1="285" x2="36" y2="285" stroke="rgba(255,255,255,0.2)" strokeWidth={1.5} strokeDasharray="4 3" />
             <text x="40" y="285" dominantBaseline="middle" className="text-[9px]" fill="var(--text-muted)">前回</text>
           </g>
         )}
-
-        <defs>
-          <linearGradient id="radarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#638cff" />
-            <stop offset="50%" stopColor="#a78bfa" />
-            <stop offset="100%" stopColor="#34d399" />
-          </linearGradient>
-          <linearGradient id="radarStroke" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#638cff" />
-            <stop offset="50%" stopColor="#a78bfa" />
-            <stop offset="100%" stopColor="#34d399" />
-          </linearGradient>
-        </defs>
       </svg>
     </div>
   );
