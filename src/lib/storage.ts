@@ -1,6 +1,6 @@
 'use client';
 
-import { DriverProfile, StoredAssessment, AssessmentResult, ActionPlan, AllAnswers } from './types';
+import { DriverProfile, StoredAssessment, AssessmentResult, ActionPlan, AllAnswers, RiskLevel, DomainType, VehicleType } from './types';
 
 const KEYS = {
   profile: 'dwa-profile',
@@ -10,6 +10,63 @@ const KEYS = {
 } as const;
 
 const MAX_HISTORY = 50;
+const MAX_IMPORT_SIZE = 1024 * 1024; // 1MB
+
+// --- Validation helpers ---
+
+const VALID_RISK_LEVELS: RiskLevel[] = ['low', 'moderate', 'high'];
+const VALID_DOMAINS: DomainType[] = ['sleep', 'stress', 'fatigue', 'diet', 'exercise'];
+const VALID_VEHICLE_TYPES: VehicleType[] = ['truck', 'bus', 'taxi', 'other'];
+
+function sanitizeString(value: unknown, maxLength = 500): string {
+  if (typeof value !== 'string') return '';
+  return value.slice(0, maxLength).trim();
+}
+
+function isValidProfile(data: unknown): data is DriverProfile {
+  if (!data || typeof data !== 'object') return false;
+  const d = data as Record<string, unknown>;
+  if (typeof d.name !== 'string' || d.name.trim().length === 0) return false;
+  if (typeof d.employeeId !== 'string') return false;
+  if (typeof d.company !== 'string') return false;
+  if (d.age !== null && typeof d.age !== 'number') return false;
+  if (d.yearsOfService !== null && typeof d.yearsOfService !== 'number') return false;
+  if (!VALID_VEHICLE_TYPES.includes(d.vehicleType as VehicleType)) return false;
+  return true;
+}
+
+function sanitizeProfile(data: Record<string, unknown>): DriverProfile {
+  return {
+    name: sanitizeString(data.name, 100),
+    employeeId: sanitizeString(data.employeeId, 50),
+    company: sanitizeString(data.company, 200),
+    age: typeof data.age === 'number' && data.age >= 0 && data.age <= 150 ? Math.floor(data.age) : null,
+    yearsOfService: typeof data.yearsOfService === 'number' && data.yearsOfService >= 0 && data.yearsOfService <= 100 ? Math.floor(data.yearsOfService) : null,
+    vehicleType: VALID_VEHICLE_TYPES.includes(data.vehicleType as VehicleType) ? (data.vehicleType as VehicleType) : 'other',
+  };
+}
+
+function isValidAssessmentEntry(entry: unknown): entry is StoredAssessment {
+  if (!entry || typeof entry !== 'object') return false;
+  const e = entry as Record<string, unknown>;
+  if (typeof e.id !== 'string' || e.id.length === 0 || e.id.length > 100) return false;
+  if (typeof e.date !== 'string') return false;
+  if (!isValidProfile(e.profile)) return false;
+  if (!e.result || typeof e.result !== 'object') return false;
+  const result = e.result as Record<string, unknown>;
+  if (!Array.isArray(result.domains)) return false;
+  for (const domain of result.domains) {
+    if (!domain || typeof domain !== 'object') return false;
+    const d = domain as Record<string, unknown>;
+    if (!VALID_DOMAINS.includes(d.domain as DomainType)) return false;
+    if (typeof d.score !== 'number') return false;
+    if (!VALID_RISK_LEVELS.includes(d.riskLevel as RiskLevel)) return false;
+  }
+  if (!VALID_RISK_LEVELS.includes(result.overallRisk as RiskLevel)) return false;
+  if (typeof result.assessmentDate !== 'string') return false;
+  if (!e.actionPlan || typeof e.actionPlan !== 'object') return false;
+  return true;
+}
 
 function read<T>(key: string): T | null {
   if (typeof window === 'undefined') return null;
@@ -37,7 +94,15 @@ export function getProfile(): DriverProfile | null {
 }
 
 export function saveProfile(profile: DriverProfile): void {
-  write(KEYS.profile, profile);
+  const sanitized: DriverProfile = {
+    name: sanitizeString(profile.name, 100),
+    employeeId: sanitizeString(profile.employeeId, 50),
+    company: sanitizeString(profile.company, 200),
+    age: typeof profile.age === 'number' && profile.age >= 0 && profile.age <= 150 ? Math.floor(profile.age) : null,
+    yearsOfService: typeof profile.yearsOfService === 'number' && profile.yearsOfService >= 0 && profile.yearsOfService <= 100 ? Math.floor(profile.yearsOfService) : null,
+    vehicleType: VALID_VEHICLE_TYPES.includes(profile.vehicleType) ? profile.vehicleType : 'other',
+  };
+  write(KEYS.profile, sanitized);
 }
 
 // --- Assessment History ---
@@ -132,7 +197,7 @@ export function saveNotes(assessmentId: string, notes: string): void {
   const history = getHistory();
   const idx = history.findIndex((a) => a.id === assessmentId);
   if (idx === -1) return;
-  history[idx].notes = notes;
+  history[idx].notes = sanitizeString(notes, 5000);
   write(KEYS.history, history);
 }
 
@@ -153,6 +218,16 @@ export function exportHistoryJSON(): string {
     history: getHistory(),
   };
   return JSON.stringify(data, null, 2);
+}
+
+function csvSafeString(value: string): string {
+  // Escape double quotes for CSV
+  let safe = value.replace(/"/g, '""');
+  // Prevent CSV formula injection (=, +, -, @, \t, \r)
+  if (/^[=+\-@\t\r]/.test(safe)) {
+    safe = "'" + safe;
+  }
+  return safe;
 }
 
 export function exportHistoryCSV(): string {
@@ -178,9 +253,9 @@ export function exportHistoryCSV(): string {
     }
     return [
       entry.result.assessmentDate,
-      entry.profile.name,
-      entry.profile.employeeId,
-      entry.profile.company,
+      csvSafeString(entry.profile.name),
+      csvSafeString(entry.profile.employeeId),
+      csvSafeString(entry.profile.company),
       riskLabel[entry.result.overallRisk] ?? entry.result.overallRisk,
       domainMap['sleep']?.score ?? '',
       domainMap['sleep']?.risk ?? '',
@@ -193,7 +268,7 @@ export function exportHistoryCSV(): string {
       domainMap['exercise']?.score ?? '',
       domainMap['exercise']?.risk ?? '',
       entry.result.referralRecommended ? 'あり' : 'なし',
-      (entry.notes ?? '').replace(/"/g, '""'),
+      csvSafeString(entry.notes ?? ''),
     ].map((v) => `"${v}"`).join(',');
   });
 
@@ -202,23 +277,59 @@ export function exportHistoryCSV(): string {
 
 // --- Import / Clear ---
 
-export function importData(json: string): { success: boolean; count: number } {
+export function importData(json: string): { success: boolean; count: number; error?: string } {
   try {
-    const data = JSON.parse(json);
-    if (data.profile) {
-      saveProfile(data.profile);
+    // File size check
+    if (json.length > MAX_IMPORT_SIZE) {
+      return { success: false, count: 0, error: 'ファイルサイズが上限（1MB）を超えています' };
     }
+
+    const data = JSON.parse(json);
+
+    if (typeof data !== 'object' || data === null) {
+      return { success: false, count: 0, error: '不正なデータ形式です' };
+    }
+
+    // Validate and sanitize profile before saving
+    if (data.profile) {
+      if (!isValidProfile(data.profile)) {
+        return { success: false, count: 0, error: 'プロフィールデータが不正です' };
+      }
+      saveProfile(sanitizeProfile(data.profile as Record<string, unknown>));
+    }
+
     if (Array.isArray(data.history)) {
+      // Limit number of entries to prevent abuse
+      if (data.history.length > MAX_HISTORY) {
+        data.history = data.history.slice(-MAX_HISTORY);
+      }
+
       const existing = getHistory();
       const existingIds = new Set(existing.map((e) => e.id));
-      const newEntries = data.history.filter((e: StoredAssessment) => !existingIds.has(e.id));
-      const merged = [...existing, ...newEntries].slice(-MAX_HISTORY);
+
+      // Validate each entry before accepting
+      const validEntries: StoredAssessment[] = [];
+      for (const entry of data.history) {
+        if (!existingIds.has(entry?.id) && isValidAssessmentEntry(entry)) {
+          // Sanitize text fields within validated entries
+          entry.profile = sanitizeProfile(entry.profile as unknown as Record<string, unknown>);
+          if (entry.notes !== undefined) {
+            entry.notes = sanitizeString(entry.notes, 5000);
+          }
+          if (entry.followUpDate !== undefined) {
+            entry.followUpDate = sanitizeString(entry.followUpDate, 20);
+          }
+          validEntries.push(entry);
+        }
+      }
+
+      const merged = [...existing, ...validEntries].slice(-MAX_HISTORY);
       write(KEYS.history, merged);
-      return { success: true, count: newEntries.length };
+      return { success: true, count: validEntries.length };
     }
     return { success: true, count: 0 };
   } catch {
-    return { success: false, count: 0 };
+    return { success: false, count: 0, error: 'ファイルの読み込みに失敗しました' };
   }
 }
 

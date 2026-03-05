@@ -45,9 +45,28 @@ export default function SettingsPage() {
     URL.revokeObjectURL(url);
   };
 
+  const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // File size validation
+    if (file.size > MAX_FILE_SIZE) {
+      setImportResult({ success: false, message: 'ファイルサイズが上限（1MB）を超えています。' });
+      setTimeout(() => setImportResult(null), 4000);
+      e.target.value = '';
+      return;
+    }
+
+    // MIME type validation
+    if (file.type && file.type !== 'application/json' && !file.name.endsWith('.json')) {
+      setImportResult({ success: false, message: 'JSONファイルのみインポート可能です。' });
+      setTimeout(() => setImportResult(null), 4000);
+      e.target.value = '';
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = () => {
       const result = importData(reader.result as string);
@@ -56,8 +75,15 @@ export default function SettingsPage() {
         setHistoryCount(getHistory().length);
         setProfile(getProfile());
       } else {
-        setImportResult({ success: false, message: 'インポートに失敗しました。ファイル形式を確認してください。' });
+        setImportResult({
+          success: false,
+          message: result.error ?? 'インポートに失敗しました。ファイル形式を確認してください。',
+        });
       }
+      setTimeout(() => setImportResult(null), 4000);
+    };
+    reader.onerror = () => {
+      setImportResult({ success: false, message: 'ファイルの読み込みに失敗しました。' });
       setTimeout(() => setImportResult(null), 4000);
     };
     reader.readAsText(file);
